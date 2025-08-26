@@ -18,7 +18,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/photography'),
+    MongooseModule.forRoot('mongodb+srv://raviprakash184:KZzK70zkPvgUqRXl@cluster0.0z3prnr.mongodb.net/grocery'),
     AuthModule, UsersModule,AddressModule, CategoriesModule, SubCategoriesModule, ProductsModule, CartModule, OrdersModule, PaymentModule, WalletModule, BannerModule, DeliveryModule, NotificationsModule],
   controllers: [AppController],
   providers: [AppService],
