@@ -6,9 +6,10 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+      "build": "NODE_OPTIONS='--max-old-space-size=4096' nest build",
+  "start": "NODE_OPTIONS='--max-old-space-size=4096' nest start  --watch",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start --watch",
+  
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
