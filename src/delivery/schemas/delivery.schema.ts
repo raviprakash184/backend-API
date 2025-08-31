@@ -19,6 +19,18 @@ export class Delivery {
 
   @Prop({ default: 0 })
   totalDeliveries: number;
+
+  @Prop({ type: [Number], default: [0, 0] }) // [longitude, latitude]
+  location?: number[];
+
+  @Prop({ default: true })
+  isActive?: boolean;
+
+  @Prop({ default: 0 })
+  rating?: number;
+
+  @Prop()
+  profilePhoto?: string;
 }
 
 export const DeliverySchema = SchemaFactory.createForClass(Delivery);

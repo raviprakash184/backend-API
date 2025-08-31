@@ -14,8 +14,27 @@ export class DeliveryService {
     return delivery.save();
   }
 
-  async findAll(): Promise<Delivery[]> {
-    return this.deliveryModel.find();
+  async findAll(options?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<Delivery[]> {
+    const query: any = {};
+    if (options?.search) {
+      query.deliveryAgentName = { $regex: options.search, $options: 'i' };
+    }
+    let mongooseQuery = this.deliveryModel.find(query);
+    if (options?.sortBy) {
+      const order = options.sortOrder === 'desc' ? -1 : 1;
+      mongooseQuery = mongooseQuery.sort({ [options.sortBy]: order });
+    }
+    if (options?.page && options?.limit) {
+      const skip = (options.page - 1) * options.limit;
+      mongooseQuery = mongooseQuery.skip(skip).limit(options.limit);
+    }
+    return mongooseQuery.exec();
   }
 
   async findOne(id: string): Promise<Delivery> {

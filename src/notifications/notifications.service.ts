@@ -15,8 +15,42 @@ export class NotificationsService {
     return this.notificationModel.create(dto);
   }
 
-  async findAll(): Promise<Notification[]> {
-    return this.notificationModel.find().sort({ createdAt: -1 });
+  async findAll(options?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<{ data: Notification[]; total: number; page?: number; limit?: number }> {
+    const query: any = {};
+    if (options?.search) {
+      query.$or = [
+        { title: { $regex: options.search, $options: 'i' } },
+        { message: { $regex: options.search, $options: 'i' } },
+      ];
+    }
+    let mongooseQuery = this.notificationModel.find(query);
+    if (options?.sortBy) {
+      const order = options.sortOrder === 'desc' ? -1 : 1;
+      mongooseQuery = mongooseQuery.sort({ [options.sortBy]: order });
+    } else {
+      mongooseQuery = mongooseQuery.sort({ createdAt: -1 });
+    }
+    if (options?.page || options?.limit || options?.search) {
+      const pageNum = options?.page ? Number(options.page) : 1;
+      const limitNum = options?.limit ? Number(options.limit) : 10;
+      const skip = (pageNum - 1) * limitNum;
+      mongooseQuery = mongooseQuery.skip(skip).limit(limitNum);
+      const [data, total] = await Promise.all([
+        mongooseQuery.exec(),
+        this.notificationModel.countDocuments(query)
+      ]);
+      return { data, total, page: pageNum, limit: limitNum };
+    } else {
+      const data = await mongooseQuery.exec();
+      const total = data.length;
+      return { data, total };
+    }
   }
 
   async findOne(id: string): Promise<Notification> {

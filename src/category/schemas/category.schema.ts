@@ -11,6 +11,20 @@ export class Category extends Document {
 
   @Prop({ default: true })
   isActive: boolean;
+  
+  @Prop()
+  description?: string;
+
+  @Prop()
+  displayOrder?: number;
+
+  // slug removed
+
+  @Prop()
+  icon?: string;
+
+  @Prop({ type: Object })
+  meta?: Record<string, any>;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

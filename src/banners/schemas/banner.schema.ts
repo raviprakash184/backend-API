@@ -16,6 +16,24 @@ export class Banner {
 
   @Prop({ default: true })
   isActive: boolean;
+
+  @Prop({ default: 0 })
+  displayOrder: number;
+
+  @Prop({ default: 'homepage' })
+  type: string;
+
+  @Prop()
+  startDate?: Date;
+
+  @Prop()
+  endDate?: Date;
+
+  @Prop({ default: 1 })
+  priority: number;
+
+  @Prop({ type: Object })
+  meta?: Record<string, any>;
 }
 
 export const BannerSchema = SchemaFactory.createForClass(Banner);

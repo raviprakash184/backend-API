@@ -11,10 +11,25 @@ export class SubCategory extends Document {
   category: string;
 
   @Prop()
-  image_url: string[];
+  description?: string;
+
+  @Prop()
+  image_url?: string[];
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive?: boolean;
+
+  @Prop()
+  displayOrder?: number;
+
+  @Prop()
+  slug?: string;
+
+  @Prop()
+  icon?: string;
+
+  @Prop({ type: Object })
+  meta?: Record<string, any>;
 }
 
 export const SubCategorySchema = SchemaFactory.createForClass(SubCategory);

@@ -45,12 +45,18 @@ export class ProductsController {
     @Body() dto: CreateProductDto,
     @UploadedFiles() files?: MulterFile[]
   ) {
-    if (files && files.length > 0) {
-      dto.image_url = files.map(file => `/uploads/${file.filename}`);
+    try {
+      if (files && files.length > 0) {
+        dto.image_url = files.map(file => `/uploads/${file.filename}`);
+      }
+      const product = await this.productsService.create(categoryId, subCategoryId, dto);
+      return { statusCode: 201, message: 'Product created successfully', data: product };
+    } catch (error) {
+      if (error.code === 11000) {
+        return { statusCode: 400, message: 'Duplicate field value', error: error.keyValue };
+      }
+      return { statusCode: 500, message: error.message || 'Server error' };
     }
-    // dto.category = categoryId;
-    // dto.subCategory = subCategoryId;
-    return this.productsService.create(categoryId,subCategoryId,dto);
   }
 
   @Put(':id/:categoryId/:subCategoryId')
@@ -72,45 +78,64 @@ export class ProductsController {
   }))
   async update(
     @Param('id') id: string,
-    // @Param('categoryId') categoryId: string,
-    // @Param('subCategoryId') subCategoryId: string,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() files?: MulterFile[]
   ) {
-    if (files && files.length > 0) {
-      dto.image_url = files.map(file => `/uploads/${file.filename}`);
+    try {
+      if (files && files.length > 0) {
+        dto.image_url = files.map(file => `/uploads/${file.filename}`);
+      }
+      const product = await this.productsService.update(id, dto);
+      return { statusCode: 200, message: 'Product updated successfully', data: product };
+    } catch (error) {
+      if (error.code === 11000) {
+        return { statusCode: 400, message: 'Duplicate field value', error: error.keyValue };
+      }
+      return { statusCode: error.status || 404, message: error.message || 'Product not found' };
     }
-    // dto.category = categoryId;
-    // dto.subCategory = subCategoryId;
-    return this.productsService.update(id,dto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all products' })
+  @ApiOperation({ summary: 'Get all products (pagination/search optional)' })
   @ApiResponse({ status: 200, description: 'Return all products' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'search', required: false, type: String })
-  findAll(
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination (optional)' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page for pagination (optional)' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by name (optional)' })
+  async findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string
   ) {
-    return this.productsService.findAll(page, limit, search);
+    try {
+      const result = await this.productsService.findAll(page, limit, search);
+      return { statusCode: 200, message: 'Products fetched successfully', data: result };
+    } catch (error) {
+      return { statusCode: 500, message: error.message || 'Server error' };
+    }
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiResponse({ status: 200, description: 'Return product by id' })
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const product = await this.productsService.findOne(id);
+      return { statusCode: 200, message: 'Product fetched successfully', data: product };
+    } catch (error) {
+      return { statusCode: error.status || 404, message: error.message || 'Product not found' };
+    }
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete product by ID' })
   @ApiResponse({ status: 200, description: 'Product deleted' })
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(id);
+  async remove(@Param('id') id: string) {
+    try {
+      await this.productsService.remove(id);
+      return { statusCode: 200, message: 'Product deleted successfully' };
+    } catch (error) {
+      return { statusCode: error.status || 404, message: error.message || 'Product not found' };
+    }
   }
 
   @Get('category/:categoryId')
@@ -119,13 +144,18 @@ export class ProductsController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
-  getProductsByCategory(
+  async getProductsByCategory(
     @Param('categoryId') categoryId: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string
   ) {
-    return this.productsService.getProductsByCategory(categoryId, page, limit, search);
+    try {
+      const result = await this.productsService.getProductsByCategory(categoryId, page, limit, search);
+      return { statusCode: 200, message: 'Products by category fetched successfully', data: result };
+    } catch (error) {
+      return { statusCode: error.status || 404, message: error.message || 'Products not found' };
+    }
   }
 
   @Get('sub-category/:subCategoryId')
@@ -134,12 +164,17 @@ export class ProductsController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
-  getProductsBySubCategory(
+  async getProductsBySubCategory(
     @Param('subCategoryId') subCategoryId: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string
   ) {
-    return this.productsService.getProductsBySubCategory(subCategoryId, page, limit, search);
+    try {
+      const result = await this.productsService.getProductsBySubCategory(subCategoryId, page, limit, search);
+      return { statusCode: 200, message: 'Products by sub-category fetched successfully', data: result };
+    } catch (error) {
+      return { statusCode: error.status || 404, message: error.message || 'Products not found' };
+    }
   }
 }

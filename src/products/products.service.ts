@@ -15,26 +15,43 @@ export class ProductsService {
   }
 
   async findAll(
-    page = 1,
-    limit = 10,
+    page?: number,
+    limit?: number,
     search?: string
-  ): Promise<{ data: Product[]; total: number; page: number; limit: number }> {
+  ): Promise<{ data: Product[]; total: number; page?: number; limit?: number }> {
     const query: any = {};
     if (search) {
       query.name = { $regex: search, $options: 'i' };
     }
-
-    const total = await this.productModel.countDocuments(query);
-    const data = await this.productModel
-      .find(query)
-      .populate('category')
-      .populate('subCategory')
-      .populate('brand')
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-
-    return { data, total, page, limit };
+    let data: Product[];
+    let total: number;
+    if (!page && !limit && !search) {
+      data = await this.productModel
+        .find(query)
+        // .sort({ displayOrder: 1 })
+        .populate('category')
+        .populate('subCategory')
+        .populate('brand')
+        .exec();
+      total = data.length;
+      return { data, total };
+    }
+    const pageNum = page ? Number(page) : 1;
+    const limitNum = limit ? Number(limit) : 10;
+    const skip = (pageNum - 1) * limitNum;
+    [data, total] = await Promise.all([
+      this.productModel
+        .find(query)
+        // .sort({ displayOrder: 1 })
+        .skip(skip)
+        .limit(limitNum)
+        .populate('category')
+        .populate('subCategory')
+        .populate('brand')
+        .exec(),
+      this.productModel.countDocuments(query)
+    ]);
+    return { data, total, page: pageNum, limit: limitNum };
   }
 
   async findOne(id: string): Promise<Product> {
@@ -62,49 +79,87 @@ export class ProductsService {
 
   async getProductsByCategory(
     categoryId: string,
-    page = 1,
-    limit = 10,
+    page?: number,
+    limit?: number,
     search?: string
-  ): Promise<{ data: Product[]; total: number; page: number; limit: number }> {
+  ): Promise<{ data: Product[]; total: number; page?: number; limit?: number }> {
     const query: any = { category: categoryId };
     if (search) {
       query.name = { $regex: search, $options: 'i' };
     }
-    const total = await this.productModel.countDocuments(query);
-    const data = await this.productModel
-      .find(query)
-      .populate('category')
-      .populate('subCategory')
-      .populate('brand')
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-
+    let data: Product[];
+    let total: number;
+    if (!page && !limit && !search) {
+      data = await this.productModel
+        .find(query)
+        // .sort({ displayOrder: 1 })
+        .populate('category')
+        .populate('subCategory')
+        .populate('brand')
+        .exec();
+      total = data.length;
+      if (!data.length) throw new NotFoundException('No products found for this category');
+      return { data, total };
+    }
+    const pageNum = page ? Number(page) : 1;
+    const limitNum = limit ? Number(limit) : 10;
+    const skip = (pageNum - 1) * limitNum;
+    [data, total] = await Promise.all([
+      this.productModel
+        .find(query)
+        // .sort({ displayOrder: 1 })
+        .skip(skip)
+        .limit(limitNum)
+        .populate('category')
+        .populate('subCategory')
+        .populate('brand')
+        .exec(),
+      this.productModel.countDocuments(query)
+    ]);
     if (!data.length) throw new NotFoundException('No products found for this category');
-    return { data, total, page, limit };
+    return { data, total, page: pageNum, limit: limitNum };
   }
 
   async getProductsBySubCategory(
     subCategoryId: string,
-    page = 1,
-    limit = 10,
+    page?: number,
+    limit?: number,
     search?: string
-  ): Promise<{ data: Product[]; total: number; page: number; limit: number }> {
+  ): Promise<{ data: Product[]; total: number; page?: number; limit?: number }> {
     const query: any = { subCategory: subCategoryId };
     if (search) {
       query.name = { $regex: search, $options: 'i' };
     }
-    const total = await this.productModel.countDocuments(query);
-    const data = await this.productModel
-      .find(query)
-      .populate('category')
-      .populate('subCategory')
-      .populate('brand')
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-
+    let data: Product[];
+    let total: number;
+    if (!page && !limit && !search) {
+      data = await this.productModel
+        .find(query)
+        // .sort({ displayOrder: 1 })
+        .populate('category')
+        .populate('subCategory')
+        .populate('brand')
+        .exec();
+      total = data.length;
+      if (!data.length) throw new NotFoundException('No products found for this sub-category');
+      return { data, total };
+    }
+    const pageNum = page ? Number(page) : 1;
+    const limitNum = limit ? Number(limit) : 10;
+    const skip = (pageNum - 1) * limitNum;
+    [data, total] = await Promise.all([
+      this.productModel
+        .find(query)
+        // .sort({ displayOrder: 1 })
+        .skip(skip)
+        .limit(limitNum)
+        .populate('category')
+        .populate('subCategory')
+        .populate('brand')
+        .exec(),
+      this.productModel.countDocuments(query)
+    ]);
     if (!data.length) throw new NotFoundException('No products found for this sub-category');
-    return { data, total, page, limit };
+    return { data, total, page: pageNum, limit: limitNum };
   }
 }

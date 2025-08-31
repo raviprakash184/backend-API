@@ -16,6 +16,9 @@ export class Product extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory', required: true })
   subCategory: string;
 
+  // @Prop({ type: Number, unique: true })
+  // displayOrder?: number;
+
 //   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Brand' })
 //   brand?: string;
 @Prop()

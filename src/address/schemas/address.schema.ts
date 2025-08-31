@@ -41,3 +41,4 @@ export class Address {
 }
 
 export const AddressSchema = SchemaFactory.createForClass(Address);
+// Duplicate class and export removed

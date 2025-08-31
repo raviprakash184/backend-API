@@ -14,8 +14,29 @@ export class CartService {
     return this.cartModel.create(createCartDto);
   }
 
-  async findAll(): Promise<Cart[]> {
-    return this.cartModel.find().populate('userId items.productId');
+  async findAll({ page, limit, search }: { page?: number; limit?: number; search?: string } = {}): Promise<{ data: Cart[]; total: number; page?: number; limit?: number }> {
+    const query: any = {};
+    if (search) {
+      query.userId = { $regex: search, $options: 'i' };
+    }
+    let data: Cart[];
+    let total: number;
+    if (!page && !limit && !search) {
+      data = await this.cartModel.find(query).populate('userId items.productId').exec();
+      total = data.length;
+      return { data, total };
+    }
+    const pageNum = page ? Number(page) : 1;
+    const limitNum = limit ? Number(limit) : 10;
+    const skip = (pageNum - 1) * limitNum;
+    [data, total] = await Promise.all([
+      this.cartModel.find(query).populate('userId items.productId').skip(skip).limit(limitNum).exec(),
+      this.cartModel.countDocuments(query)
+    ]);
+    return { data, total, page: pageNum, limit: limitNum };
+  }
+  async findByUserId(userId: string): Promise<Cart[]> {
+    return this.cartModel.find({ userId }).populate('userId items.productId').exec();
   }
 
   async findOne(id: string): Promise<Cart> {

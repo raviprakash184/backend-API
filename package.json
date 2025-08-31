@@ -6,10 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-      "build": "NODE_OPTIONS='--max-old-space-size=4096' nest build",
-  "start": "NODE_OPTIONS='--max-old-space-size=4096' nest start  --watch",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' nest build",
+    "start": "NODE_OPTIONS='--max-old-space-size=4096' nest start  --watch",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-  
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -27,7 +26,11 @@
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-socket.io": "^11.1.6",
+    "@nestjs/serve-static": "^5.0.3",
     "@nestjs/swagger": "^11.2.0",
+    "@nestjs/websockets": "^11.1.6",
+    "@ng-bootstrap/ng-bootstrap": "^19.0.1",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -36,6 +39,7 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.8.1",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {

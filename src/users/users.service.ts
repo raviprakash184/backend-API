@@ -15,10 +15,10 @@ export class UsersService {
   }
 
   async findAll(
-    page = 1,
-    limit = 10,
+    page?: number,
+    limit?: number,
     search?: string,
-  ): Promise<{ data: User[]; total: number; page: number; limit: number }> {
+  ): Promise<{ data: User[]; total: number; page?: number; limit?: number }> {
     const query: any = {};
     if (search) {
       query.$or = [
@@ -27,15 +27,21 @@ export class UsersService {
         { phone: { $regex: search, $options: 'i' } },
       ];
     }
-
-    const total = await this.userModel.countDocuments(query);
-    const data = await this.userModel
-      .find(query)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-
-    return { data, total, page, limit };
+    if (page || limit || search) {
+      const pageNum = page ? Number(page) : 1;
+      const limitNum = limit ? Number(limit) : 10;
+      const total = await this.userModel.countDocuments(query);
+      const data = await this.userModel
+        .find(query)
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum)
+        .exec();
+      return { data, total, page: pageNum, limit: limitNum };
+    } else {
+      const data = await this.userModel.find(query).exec();
+      const total = data.length;
+      return { data, total };
+    }
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {

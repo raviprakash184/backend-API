@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNumber, IsBoolean, IsArray } from 'class-validator';
 
+
 export class CreateProductDto {
   @ApiProperty({ type:String,required:true})
   @IsString()
@@ -11,15 +12,20 @@ export class CreateProductDto {
   @IsString()
   description?: string;
 
-//  @ApiPropertyOptional({ example: '64e8c2f2e3b8a2a1c8d6f1b2', description: 'Category ObjectId' })
-//   @IsOptional()
-//   @IsString()
-//   category?: string;
+  @ApiPropertyOptional({ example: '64e8c2f2e3b8a2a1c8d6f1b2', description: 'Category ObjectId' })
+  @IsOptional()
+  @IsString()
+  category?: string;
 
-//   @ApiPropertyOptional({ example: '64e8c2f2e3b8a2a1c8d6f1b3', description: 'SubCategory ObjectId' })
-//   @IsOptional()
-//   @IsString()
-//   subCategory?: string;
+  @ApiPropertyOptional({ example: '64e8c2f2e3b8a2a1c8d6f1b3', description: 'SubCategory ObjectId' })
+  @IsOptional()
+  @IsString()
+  subCategory?: string;
+
+  // @ApiPropertyOptional({ example: 1, description: 'Display order for sorting' })
+  // @IsOptional()
+  // @IsNumber()
+  // displayOrder?: number;
 
   @ApiPropertyOptional({ example: '64e8c2f2e3b8a2a1c8d6f1b4', description: 'Brand ObjectId or name' })
   @IsOptional()
